@@ -1,7 +1,4 @@
 import requests
-
-from bs4 import BeautifulSoup
-
 from grader import Grader
 
 def get_html(url):
@@ -12,13 +9,8 @@ def get_html(url):
         return None
 
 # Example usage
-url = "https://openai.com/blog/governance-of-superintelligence"
+url = "https://blog.rust-lang.org/2023/05/29/RustConf.html"
 html = get_html(url)
-if html:
-    # print(html)
-    pass
-else:
-    print("Failed to acquire HTML from the URL.")
 
 G = Grader(html)
 print(G.main_node.text)
