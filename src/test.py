@@ -1,6 +1,8 @@
 import requests
-from sag import SAG
+
 from bs4 import BeautifulSoup
+
+from grader import Grader
 
 def get_html(url):
     response = requests.get(url)
@@ -18,21 +20,5 @@ if html:
 else:
     print("Failed to acquire HTML from the URL.")
 
-
-soup: BeautifulSoup = BeautifulSoup(html, features="lxml")
-
-
-sag = SAG()
-def gotree(node, depth=1, count=0):
-    ct = 1
-    for i in node:
-        if i.name is None:
-            continue
-        ct += gotree(i, depth + 1)
-        sag.score(i, ct)
-    return ct
-
-gotree(soup)
-cleaned_soup = sag.get_content()
-
-print(cleaned_soup)
+G = Grader(html)
+print(G.main_node.text)

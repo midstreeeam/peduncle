@@ -1,5 +1,5 @@
+import bs4
 from bs4 import BeautifulSoup
-
 
 class SAG:
     def __init__(self):
@@ -15,7 +15,7 @@ class SAG:
     def __score_text_children_ratio(self, child_count, text_length):
         # too much and too little children gets low score
         # more text higher the score
-        c = child_count / 10
+        c = child_count / 15
         c_score = c + 1 / c
         return text_length / c_score
 
@@ -72,7 +72,7 @@ class SAG:
         length_score = self.__score_text_link_ratio(node, text_length)
         tag_score = self.__score_tag_name(node)
 
-        return child_score * tag_score
+        return child_score * (tag_score ** 0.3)
 
     def score(self, node, child_count):
         self.nodelist.append([node, self._score(node, child_count)])
@@ -80,3 +80,26 @@ class SAG:
     def get_content(self):
         self.nodelist = sorted(self.nodelist, key=lambda x: x[1], reverse=True)
         return self.nodelist[0][0]
+    
+class Grader(object):
+    
+    def __init__(self, htmlstr):
+        self.htmlstr = htmlstr
+        self.soup = BeautifulSoup(htmlstr, features="lxml")
+        self.sag = SAG()
+        self.nodelist = []
+        self.__run_sag()
+        self.main_node:bs4.element.Tag = self.sag.get_content()
+        pass
+    
+    def __run_sag(self):
+        self.gotree(self.soup)
+
+    def gotree(self, node, depth=1):
+        ct = 1
+        for i in node:
+            if i.name is None:
+                continue
+            ct += self.gotree(i, depth + 1)
+            self.sag.score(i, ct)
+        return ct
