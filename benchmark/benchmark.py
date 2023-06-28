@@ -12,7 +12,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from tqdm import tqdm
 
-from grader import Grader
+from src.peduncle.peduncle import *
 
 class DataLoader(object):
     def __init__(self, limit=None) -> None:
@@ -109,7 +109,9 @@ if __name__=="__main__":
             raw_file.close()
             eval_file.close()
             
-            extracted_content = evaluator.clean(Grader(raw_str).main_node.text)
+            # extracted_content = evaluator.clean(Grader(raw_str).main_node.text)
+            extracted_content = evaluator.clean(extract_text(raw_str))
+
             eval_str = evaluator.clean(eval_str)
             evaluator.push(extracted_content,eval_str)
             

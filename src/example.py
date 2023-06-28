@@ -1,5 +1,5 @@
 import requests
-from grader import Grader
+from peduncle.peduncle import extract_text
 
 def get_html(url):
     response = requests.get(url)
@@ -10,7 +10,4 @@ def get_html(url):
 
 # Example usage
 url = "https://blog.rust-lang.org/2023/05/29/RustConf.html"
-html = get_html(url)
-
-G = Grader(html)
-print(G.main_node.text)
+print(extract_text(get_html(url)))
