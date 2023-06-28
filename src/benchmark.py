@@ -3,6 +3,9 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from collections import defaultdict
 import glob
+import re
+import random
+random.seed(3)
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -36,6 +39,7 @@ class DataLoader(object):
         merged_dict = {k: (raw_dict[k], eval_dict[k]) for k in raw_dict.keys() & eval_dict.keys()}
 
         self.values = sorted(list(merged_dict.values()))
+        random.shuffle(self.values)
         
         if limit is not None:
             self.values = self.values[:limit]
@@ -82,12 +86,20 @@ class Evaluator(object):
         
     def get_final_score(self):
         self.run()
-        return self.scores.mean()        
+        return self.scores.mean()
+    
+    def clean(self, text):
+        text: str = text.replace("\n", " ").replace("\r", " ").replace("\t", " ")
+        return re.sub(r'\s+', ' ', text)
         
 if __name__=="__main__":
     
     data = DataLoader()
     evaluator = Evaluator()
+    
+    extracted_content_len = 0
+    eval_str_len = 0
+    
     with tqdm(total=len(data)) as bar:
         for raw_fname,eval_fname in data:
             raw_file = open(raw_fname,'r',encoding='utf8',errors='ignore')
@@ -97,9 +109,14 @@ if __name__=="__main__":
             raw_file.close()
             eval_file.close()
             
-            extracted_content = Grader(raw_str).main_node.text
+            extracted_content = evaluator.clean(Grader(raw_str).main_node.text)
+            eval_str = evaluator.clean(eval_str)
             evaluator.push(extracted_content,eval_str)
+            
+            extracted_content_len += len(extracted_content)/len(data)
+            eval_str_len += len(eval_str)/len(data)
+            
             bar.update()
     
-    print(evaluator.get_final_score())
-    # print(evaluator.scores)
+    print(f"similarty: {evaluator.get_final_score()}")
+    print(f"len_diff: {extracted_content_len-eval_str_len}")

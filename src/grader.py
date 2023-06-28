@@ -12,7 +12,7 @@ class SAG:
         return len(text)
 
     def __score_text_children_ratio(self, child_count, text_length):
-        c = child_count / 15
+        c = child_count / 25
         c_score = c + 1 / c
         return text_length / c_score
 
@@ -24,7 +24,7 @@ class SAG:
         if node.name in [ "script", "style", "noscript", "applet", "meta", 
               "link", "a", "base", "img", "button", "header", "footer",
               "aside", "tfoot", "menu", "nav", "frame", "iframe", 
-              "form", "title", "h1", "h2"]:
+              "form", "title", "h1", "h2", "html","head"]:
             return 0
         return 1
 
@@ -40,8 +40,10 @@ class SAG:
     def get_content(self):
         self.nodelist = sorted(self.nodelist, key=lambda x: x[1], reverse=True)
         return self.nodelist[0][0]
-    
+ 
 class Grader(object):
+    
+    content_child_tags=["td","th","tr","li","p"]
     
     def __init__(self, htmlstr):
         self.htmlstr = htmlstr
@@ -55,7 +57,10 @@ class Grader(object):
         self.gotree(self.soup)
 
     def gotree(self, node, depth=1):
-        ct = 1
+        if node.name in self.content_child_tags:
+            ct = 0.2
+        else:
+            ct = 1
         for i in node:
             if i.name is None:
                 continue
