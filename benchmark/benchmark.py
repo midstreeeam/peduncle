@@ -88,6 +88,13 @@ class Evaluator(object):
         self.run()
         return self.scores.mean()
     
+    def get_acc_rate(self,threshold):
+        c = 0
+        for i in self.scores:
+            if i > threshold:
+                c+=1
+        return c/len(self.scores)
+    
     def clean(self, text):
         text: str = text.replace("\n", " ").replace("\r", " ").replace("\t", " ")
         return re.sub(r'\s+', ' ', text)
@@ -97,8 +104,7 @@ if __name__=="__main__":
     data = DataLoader()
     evaluator = Evaluator()
     
-    extracted_content_len = 0
-    eval_str_len = 0
+    diffs = []
     
     with tqdm(total=len(data)) as bar:
         for raw_fname,eval_fname in data:
@@ -110,15 +116,16 @@ if __name__=="__main__":
             eval_file.close()
             
             # extracted_content = evaluator.clean(Grader(raw_str).main_node.text)
-            extracted_content = evaluator.clean(extract_text(raw_str))
+            extracted_content = evaluator.clean(extract_text(raw_str,0.21))
 
             eval_str = evaluator.clean(eval_str)
             evaluator.push(extracted_content,eval_str)
             
-            extracted_content_len += len(extracted_content)/len(data)
-            eval_str_len += len(eval_str)/len(data)
+            diffs.append(len(extracted_content)-len(eval_str))
             
             bar.update()
     
     print(f"similarty: {evaluator.get_final_score()}")
-    print(f"len_diff: {extracted_content_len-eval_str_len}")
+    print(f"acc: {evaluator.get_acc_rate(0.95)}")
+    print(f"len_diff: {np.mean(diffs)}")
+    print(f"diff std: {np.std(diffs)}")
