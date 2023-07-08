@@ -1,5 +1,7 @@
 # peduncle
 
+[![Downloads](https://static.pepy.tech/badge/peduncle)](https://pepy.tech/project/peduncle)
+
 very very very simple DOM based HTML content extraction tool, get rid of boilerplate dressing of a web page[1].
 
 easy but useable
