@@ -1,6 +1,7 @@
 # peduncle
 
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/midstreeeam/peduncle/publish.yml)
+![PyPI](https://img.shields.io/pypi/v/peduncle)
 [![Downloads](https://static.pepy.tech/badge/peduncle)](https://pepy.tech/project/peduncle)
 
 very very very simple DOM based HTML content extraction tool, get rid of boilerplate dressing of a web page[1].
