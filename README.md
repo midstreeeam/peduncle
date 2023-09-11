@@ -54,3 +54,21 @@ benchmark data comes from [dragnet_data](https://github.com/seomoz/dragnet_data)
 - 95hit rate: percentage of similarity larger than 95%
 - length gap: extracted text length - answer text length
 - std: std
+
+## algorithm
+
+Node grading is based on several key features:
+
+- **tag name:** The tag name is a crucial determinant of a node's potential to contain the "main content". Nodes tagged with `<content>`, `<article>`, or `<main>` are more likely to house the main content than those tagged with `<menu>`, `<nav>`, or `<aside>`.
+
+- **children tags:** The distribution of a node's child tags can also suggest its likelihood of being the main content. Nodes with a higher percentage of `<p>` tags among child tags are scored favorably.
+
+- **text - children ratio:** Nodes with an excessively high or low number of children, or those with too much or too little text, are less likely to contain the main content — they're located too high or too low in the HTML tree. We thus use the text-to-children ratio to assess the suitability of a node, aiming for nodes that contain only a few sizable blocks of text.
+
+  We use the following equation to calculate this ratio:
+  
+  $$\frac{t\times(1+c/n)}{c/n}$$
+  
+  Here, $t$ is the text length, $c$ is the total number of child nodes, and $n$ is a variable used to gauge what counts as "too few children". The $n$ variable is also instrumental in adjusting whether we want the chosen node to be closer to the root or leaf.
+
+We recursively grade each node in the HTML tree and ultimately select one node per document as the main content.
